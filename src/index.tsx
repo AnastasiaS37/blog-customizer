@@ -1,6 +1,5 @@
 import { createRoot } from 'react-dom/client';
 import { StrictMode, CSSProperties, useState } from 'react';
-import clsx from 'clsx';
 
 import { Article } from './components/article/Article';
 import { ArticleParamsForm } from './components/article-params-form/ArticleParamsForm';
@@ -25,7 +24,7 @@ const App = () => {
 
 	return (
 		<main
-			className={clsx(styles.main)}
+			className={styles.main}
 			style={
 				{
 					'--font-family': appliedParams.fontFamilyOption.value,
@@ -35,7 +34,10 @@ const App = () => {
 					'--container-width': appliedParams.contentWidth.value,
 				} as CSSProperties
 			}>
-			<ArticleParamsForm onApply={handleFormSubmit} />
+			<ArticleParamsForm
+				onApply={handleFormSubmit}
+				appliedParams={appliedParams}
+			/>
 			<Article />
 		</main>
 	);

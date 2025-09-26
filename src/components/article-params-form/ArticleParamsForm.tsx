@@ -20,26 +20,26 @@ import clsx from 'clsx';
 
 type ArticleParamsFormProps = {
 	onApply: (params: ArticleStateType) => void;
+	appliedParams: ArticleStateType;
 };
 
-export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
-	const [isOpen, setIsOpen] = useState(false);
+export const ArticleParamsForm = ({
+	onApply,
+	appliedParams,
+}: ArticleParamsFormProps) => {
+	const [isFormOpen, setIsFormOpen] = useState(false);
 	const toggleState = () => {
-		setIsOpen((isOpen) => !isOpen);
+		setIsFormOpen((isFormOpen) => !isFormOpen);
 	};
 
 	// Сохранение выбранных в форме параметров
-	const [fontFamily, setFontFamily] = useState(
-		defaultArticleState.fontFamilyOption
-	);
-	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
+	const [fontFamily, setFontFamily] = useState(appliedParams.fontFamilyOption);
+	const [fontSize, setFontSize] = useState(appliedParams.fontSizeOption);
+	const [fontColor, setFontColor] = useState(appliedParams.fontColor);
 	const [backgroundColor, setBackgroundColor] = useState(
-		defaultArticleState.backgroundColor
+		appliedParams.backgroundColor
 	);
-	const [contentWidth, setContentWidth] = useState(
-		defaultArticleState.contentWidth
-	);
+	const [contentWidth, setContentWidth] = useState(appliedParams.contentWidth);
 
 	// Функция обработки отправки формы
 	const handleSubmit = (event: React.FormEvent) => {
@@ -52,11 +52,11 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 			contentWidth: contentWidth,
 		};
 		onApply(newParams);
-		setIsOpen(false);
+		setIsFormOpen(false);
 	};
 
 	// Функция обработки очистки формы
-	const handleReset = (event: React.FormEvent) => {
+	const handleReset = (event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setFontFamily(defaultArticleState.fontFamilyOption);
 		setFontSize(defaultArticleState.fontSizeOption);
@@ -71,16 +71,17 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 			backgroundColor: defaultArticleState.backgroundColor,
 			contentWidth: defaultArticleState.contentWidth,
 		});
-		setIsOpen(false);
+		setIsFormOpen(false);
 	};
 
 	// Закрытие формы при клике вне неё
 	const modalRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
+		if (!isFormOpen) return;
 		const handleClick = (event: MouseEvent) => {
 			const { target } = event;
 			if (target instanceof Node && !modalRef.current?.contains(target)) {
-				setIsOpen(false);
+				setIsFormOpen(false);
 			}
 		};
 		window.addEventListener('mousedown', handleClick);
@@ -88,13 +89,15 @@ export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 		return () => {
 			window.removeEventListener('mousedown', handleClick);
 		};
-	}, []);
+	}, [isFormOpen]);
 
 	return (
 		<>
-			<ArrowButton isOpen={isOpen} onClick={toggleState} />
+			<ArrowButton isOpen={isFormOpen} onClick={toggleState} />
 			<aside
-				className={clsx(styles.container, { [styles.container_open]: isOpen })}
+				className={clsx(styles.container, {
+					[styles.container_open]: isFormOpen,
+				})}
 				ref={modalRef}>
 				<form
 					className={styles.form}
